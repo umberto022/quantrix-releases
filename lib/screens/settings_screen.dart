@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/currency_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
 import '../theme/app_theme.dart';
+import 'admin_screen.dart';
+import 'price_alerts_screen.dart';
+import 'ai_chat_screen.dart';
+
+// Emails con acceso de admin
+const _adminEmails = ['pedromateo.desarrollo@gmail.com'];
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -13,13 +20,16 @@ class SettingsScreen extends ConsumerWidget {
     final converterAsync = ref.watch(currencyConverterProvider);
     final authState = ref.watch(authProvider);
     final user = authState.user;
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final isAdmin = _adminEmails.contains(user?.email ?? '');
 
     return Scaffold(
       appBar: AppBar(title: const Text('Configuración')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Perfil de usuario
+          // Perfil
           if (user != null) ...[
             const _SectionHeader('PERFIL'),
             const SizedBox(height: 8),
@@ -37,10 +47,7 @@ class SettingsScreen extends ConsumerWidget {
                     backgroundColor: AppTheme.primary.withOpacity(0.2),
                     child: Text(
                       user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
-                      style: const TextStyle(
-                          color: AppTheme.primary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: AppTheme.primary, fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -49,13 +56,9 @@ class SettingsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(user.name,
-                            style: const TextStyle(
-                                color: AppTheme.textPrimary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16)),
+                            style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600, fontSize: 16)),
                         Text(user.email,
-                            style: const TextStyle(
-                                color: AppTheme.textSecondary, fontSize: 13)),
+                            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
                       ],
                     ),
                   ),
@@ -66,11 +69,12 @@ class SettingsScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      user.plan.toUpperCase(),
-                      style: const TextStyle(
-                          color: AppTheme.primary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold),
+                      isAdmin ? 'ADMIN' : user.plan.toUpperCase(),
+                      style: TextStyle(
+                        color: isAdmin ? AppTheme.warning : AppTheme.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -83,27 +87,17 @@ class SettingsScreen extends ConsumerWidget {
                   context: context,
                   builder: (ctx) => AlertDialog(
                     backgroundColor: AppTheme.surface,
-                    title: const Text('Cerrar sesión',
-                        style: TextStyle(color: AppTheme.textPrimary)),
-                    content: const Text('¿Querés cerrar tu sesión?',
-                        style: TextStyle(color: AppTheme.textSecondary)),
+                    title: const Text('Cerrar sesión', style: TextStyle(color: AppTheme.textPrimary)),
+                    content: const Text('¿Querés cerrar tu sesión?', style: TextStyle(color: AppTheme.textSecondary)),
                     actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Cancelar',
-                            style: TextStyle(color: AppTheme.textSecondary)),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('Cerrar sesión',
-                            style: TextStyle(color: AppTheme.bearish)),
-                      ),
+                      TextButton(onPressed: () => Navigator.pop(ctx, false),
+                          child: const Text('Cancelar', style: TextStyle(color: AppTheme.textSecondary))),
+                      TextButton(onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text('Cerrar sesión', style: TextStyle(color: AppTheme.bearish))),
                     ],
                   ),
                 );
-                if (confirm == true) {
-                  ref.read(authProvider.notifier).logout();
-                }
+                if (confirm == true) ref.read(authProvider.notifier).logout();
               },
               child: Container(
                 padding: const EdgeInsets.all(14),
@@ -117,8 +111,7 @@ class SettingsScreen extends ConsumerWidget {
                   children: [
                     Icon(Icons.logout, color: AppTheme.bearish, size: 18),
                     SizedBox(width: 8),
-                    Text('Cerrar sesión',
-                        style: TextStyle(color: AppTheme.bearish, fontWeight: FontWeight.w600)),
+                    Text('Cerrar sesión', style: TextStyle(color: AppTheme.bearish, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
@@ -126,11 +119,74 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
           ],
 
-          // Sección moneda
+          // Funciones
+          const _SectionHeader('FUNCIONES'),
+          const SizedBox(height: 8),
+          _NavTile(
+            icon: Icons.notifications_active_outlined,
+            label: 'Alertas de precio',
+            subtitle: 'Notificaciones cuando el precio llegue a tu objetivo',
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PriceAlertsScreen())),
+          ),
+          const SizedBox(height: 8),
+          _NavTile(
+            icon: Icons.auto_awesome_outlined,
+            label: 'Chat IA',
+            subtitle: 'Preguntá sobre mercados, señales e indicadores',
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen())),
+          ),
+          if (isAdmin) ...[
+            const SizedBox(height: 8),
+            _NavTile(
+              icon: Icons.admin_panel_settings_outlined,
+              label: 'Panel de administrador',
+              subtitle: 'Usuarios, estadísticas y notificaciones masivas',
+              color: AppTheme.warning,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminScreen())),
+            ),
+          ],
+          const SizedBox(height: 24),
+
+          // Apariencia
+          const _SectionHeader('APARIENCIA'),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppTheme.cardBorder),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+                  color: AppTheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Tema', style: TextStyle(color: AppTheme.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+                      Text(isDark ? 'Oscuro' : 'Claro', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                    ],
+                  ),
+                ),
+                Switch(
+                  value: isDark,
+                  activeColor: AppTheme.primary,
+                  onChanged: (_) => ref.read(themeModeProvider.notifier).toggle(),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Moneda
           const _SectionHeader('MONEDA DE VISUALIZACIÓN'),
           const SizedBox(height: 8),
-
-          // Tasa actual
           converterAsync.when(
             data: (conv) => conv.currency.code == 'USD'
                 ? const SizedBox.shrink()
@@ -159,8 +215,6 @@ class SettingsScreen extends ConsumerWidget {
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
           ),
-
-          // Lista de monedas
           ...supportedCurrencies.map((currency) => _CurrencyTile(
                 currency: currency,
                 isSelected: selected.code == currency.code,
@@ -168,9 +222,9 @@ class SettingsScreen extends ConsumerWidget {
               )),
 
           const SizedBox(height: 24),
-          const _SectionHeader('Sobre Quantrix'),
+          const _SectionHeader('SOBRE QUANTRIX'),
           const SizedBox(height: 8),
-          _InfoTile('Versión', '1.0.0'),
+          _InfoTile('Versión', '1.0.2'),
           _InfoTile('Datos crypto', 'CoinGecko API'),
           _InfoTile('Datos acciones', 'Alpha Vantage'),
           _InfoTile('Tipo de cambio', 'Frankfurter + DolarAPI'),
@@ -181,65 +235,110 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
+class _NavTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final VoidCallback onTap;
+  final Color color;
+  const _NavTile({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.onTap,
+    this.color = AppTheme.primary,
+  });
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.cardBorder),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label,
+                        style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+                    Text(subtitle,
+                        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: AppTheme.textSecondary, size: 18),
+            ],
+          ),
+        ),
+      );
+}
+
 class _CurrencyTile extends StatelessWidget {
   final Currency currency;
   final bool isSelected;
   final VoidCallback onTap;
-
-  const _CurrencyTile({
-    required this.currency,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const _CurrencyTile({required this.currency, required this.isSelected, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withOpacity(0.1) : AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppTheme.primary : AppTheme.cardBorder,
-            width: isSelected ? 1.5 : 1,
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? AppTheme.primary.withOpacity(0.1) : AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? AppTheme.primary : AppTheme.cardBorder,
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Text(currency.flag, style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(currency.code,
+                        style: TextStyle(
+                            color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15)),
+                    Text(currency.name, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                  ],
+                ),
+              ),
+              Text(currency.symbol,
+                  style: TextStyle(
+                      color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold)),
+              if (isSelected) ...[
+                const SizedBox(width: 8),
+                const Icon(Icons.check_circle, color: AppTheme.primary, size: 20),
+              ],
+            ],
           ),
         ),
-        child: Row(
-          children: [
-            Text(currency.flag, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(currency.code,
-                      style: TextStyle(
-                          color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15)),
-                  Text(currency.name,
-                      style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
-                ],
-              ),
-            ),
-            Text(currency.symbol,
-                style: TextStyle(
-                    color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
-            if (isSelected) ...[
-              const SizedBox(width: 8),
-              const Icon(Icons.check_circle, color: AppTheme.primary, size: 20),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
+      );
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -247,14 +346,9 @@ class _SectionHeader extends StatelessWidget {
   const _SectionHeader(this.text);
 
   @override
-  Widget build(BuildContext context) => Text(
-        text,
-        style: const TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 1.2),
-      );
+  Widget build(BuildContext context) => Text(text,
+      style: const TextStyle(
+          color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1.2));
 }
 
 class _InfoTile extends StatelessWidget {
@@ -270,8 +364,7 @@ class _InfoTile extends StatelessWidget {
           children: [
             Text(label, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
             Text(value,
-                style: const TextStyle(
-                    color: AppTheme.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
           ],
         ),
       );

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'providers/theme_provider.dart';
 import 'services/connection_service.dart';
+import 'services/fcm_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/signals_screen.dart';
 import 'screens/screener_screen.dart';
-import 'screens/forex_screen.dart';
+import 'screens/news_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 
@@ -25,22 +27,29 @@ void main() async {
   ));
 
   await Firebase.initializeApp();
-
-  // Iniciar monitoreo de conexión
   ConnectionService().init();
 
   runApp(const ProviderScope(child: QuantrixApp()));
 }
 
-class QuantrixApp extends StatelessWidget {
+class QuantrixApp extends ConsumerWidget {
   const QuantrixApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
+    // Iniciar FCM cuando el usuario esté listo
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FcmService().init();
+    });
+
     return MaterialApp(
       title: 'Quantrix',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeMode,
       home: const SplashScreen(),
     );
   }
@@ -60,7 +69,7 @@ class _MainShellState extends State<MainShell> {
     DashboardScreen(),
     SignalsScreen(),
     ScreenerScreen(),
-    ForexScreen(),
+    NewsScreen(),
     SettingsScreen(),
   ];
 
@@ -96,10 +105,6 @@ class _BottomNav extends StatelessWidget {
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: onTap,
-        backgroundColor: AppTheme.surface,
-        selectedItemColor: AppTheme.primary,
-        unselectedItemColor: AppTheme.textSecondary,
-        type: BottomNavigationBarType.fixed,
         selectedFontSize: 11,
         unselectedFontSize: 11,
         elevation: 0,
@@ -107,7 +112,7 @@ class _BottomNav extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Mercado'),
           BottomNavigationBarItem(icon: Icon(Icons.bolt), label: 'Señales'),
           BottomNavigationBarItem(icon: Icon(Icons.filter_list), label: 'Screener'),
-          BottomNavigationBarItem(icon: Icon(Icons.currency_exchange), label: 'Forex'),
+          BottomNavigationBarItem(icon: Icon(Icons.newspaper_outlined), label: 'Noticias'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Config'),
         ],
       ),

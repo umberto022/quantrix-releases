@@ -195,12 +195,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) => AssetCard(
-                      asset: filtered[index],
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AssetDetailScreen(asset: filtered[index]),
+                    (context, index) => _AnimatedCard(
+                      index: index,
+                      child: AssetCard(
+                        asset: filtered[index],
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                AssetDetailScreen(asset: filtered[index]),
+                          ),
                         ),
                       ),
                     ),
@@ -351,6 +355,50 @@ class _FearGreedChip extends StatelessWidget {
       ],
     );
   }
+}
+
+class _AnimatedCard extends StatefulWidget {
+  final Widget child;
+  final int index;
+  const _AnimatedCard({required this.child, required this.index});
+
+  @override
+  State<_AnimatedCard> createState() => _AnimatedCardState();
+}
+
+class _AnimatedCardState extends State<_AnimatedCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _fade;
+  late Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 350));
+    _fade = Tween<double>(begin: 0, end: 1)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+    _slide =
+        Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
+            CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+
+    Future.delayed(Duration(milliseconds: widget.index * 40), () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+        opacity: _fade,
+        child: SlideTransition(position: _slide, child: widget.child),
+      );
 }
 
 class _ShimmerCard extends StatelessWidget {

@@ -314,13 +314,62 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               fontWeight: FontWeight.w500)),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
+
+                  // Trust badges
+                  const _TrustBadges(),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TrustBadges extends StatelessWidget {
+  const _TrustBadges();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Divider(color: Color(0xFF30363D)),
+        const SizedBox(height: 14),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _Badge(icon: Icons.lock_outline, label: 'Cifrado\nSSL'),
+            _Badge(icon: Icons.shield_outlined, label: 'Firebase\nAuth'),
+            _Badge(icon: Icons.verified_outlined, label: 'Datos\nseguros'),
+            _Badge(icon: Icons.trending_up_outlined, label: 'Tiempo\nreal'),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _Badge({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, color: AppTheme.primary, size: 20),
+        const SizedBox(height: 4),
+        Text(label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 10,
+                height: 1.3)),
+      ],
     );
   }
 }

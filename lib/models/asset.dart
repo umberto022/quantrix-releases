@@ -10,6 +10,7 @@ class Asset {
   final double marketCap;
   final String? imageUrl;
   final List<double> sparkline;
+  final int? marketCapRank;
 
   Asset({
     required this.id,
@@ -23,6 +24,7 @@ class Asset {
     required this.marketCap,
     this.imageUrl,
     this.sparkline = const [],
+    this.marketCapRank,
   });
 
   bool get isBullish => changePercent24h >= 0;
@@ -44,6 +46,7 @@ class Asset {
       marketCap: (json['market_cap'] as num?)?.toDouble() ?? 0,
       imageUrl: json['image'],
       sparkline: sparklineData,
+      marketCapRank: (json['market_cap_rank'] as num?)?.toInt(),
     );
   }
 

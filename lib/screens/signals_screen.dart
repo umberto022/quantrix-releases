@@ -175,9 +175,9 @@ class _SignalCard extends StatelessWidget {
       final bytes = byteData.buffer.asUint8List();
 
       final signalLabel = signal.signalLabel;
-      final text = '${asset.symbol.toUpperCase()} · Señal $signalLabel\n'
+      final text = '📊 ${asset.symbol.toUpperCase()} · Señal $signalLabel\n'
           'RSI: ${signal.rsi.toStringAsFixed(0)} · Confianza: ${signal.confidence.toInt()}%\n'
-          'Análisis generado por Quantrix';
+          '🔍 Análisis generado por Quantrix';
 
       await Share.shareXFiles(
         [XFile.fromData(bytes, name: '${asset.symbol}_signal.png', mimeType: 'image/png')],
@@ -186,9 +186,9 @@ class _SignalCard extends StatelessWidget {
     } catch (_) {
       // Fallback: compartir solo texto
       await Share.share(
-        '${asset.symbol.toUpperCase()} "” ${signal.signalLabel}\n'
+        '📊 ${asset.symbol.toUpperCase()} · ${signal.signalLabel}\n'
         'RSI: ${signal.rsi.toStringAsFixed(0)} · Confianza: ${signal.confidence.toInt()}%\n'
-        'Análisis generado por Quantrix',
+        '🔍 Análisis generado por Quantrix',
       );
     }
   }

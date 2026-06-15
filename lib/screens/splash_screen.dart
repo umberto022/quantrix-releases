@@ -9,30 +9,51 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnim;
-  late Animation<double> _scaleAnim;
+    with TickerProviderStateMixin {
+  late AnimationController _logoCtrl;
+  late AnimationController _textCtrl;
+  late AnimationController _pulseCtrl;
+
+  late Animation<double> _logoScale;
+  late Animation<double> _logoFade;
+  late Animation<double> _textFade;
+  late Animation<Offset> _textSlide;
+  late Animation<double> _pulse;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-    _scaleAnim = Tween<double>(begin: 0.8, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
-    _controller.forward();
+
+    _logoCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 700));
+    _textCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
+    _pulseCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1200))
+      ..repeat(reverse: true);
+
+    _logoScale = Tween<double>(begin: 0.5, end: 1.0).animate(
+        CurvedAnimation(parent: _logoCtrl, curve: Curves.elasticOut));
+    _logoFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: _logoCtrl, curve: const Interval(0, 0.5)));
+
+    _textFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: _textCtrl, curve: Curves.easeIn));
+    _textSlide =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+            CurvedAnimation(parent: _textCtrl, curve: Curves.easeOut));
+
+    _pulse = Tween<double>(begin: 0.8, end: 1.0).animate(
+        CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+
+    _logoCtrl.forward().then((_) => _textCtrl.forward());
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _logoCtrl.dispose();
+    _textCtrl.dispose();
+    _pulseCtrl.dispose();
     super.dispose();
   }
 
@@ -41,28 +62,30 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnim,
-          child: ScaleTransition(
-            scale: _scaleAnim,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 90,
-                  height: 90,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Logo animado
+            FadeTransition(
+              opacity: _logoFade,
+              child: ScaleTransition(
+                scale: _logoScale,
+                child: Container(
+                  width: 96,
+                  height: 96,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [AppTheme.primary, Color(0xFF00A884)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primary.withValues(alpha: 0.4),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
+                        color: AppTheme.primary.withValues(alpha: 0.45),
+                        blurRadius: 40,
+                        spreadRadius: 4,
+                        offset: const Offset(0, 12),
                       ),
                     ],
                   ),
@@ -70,32 +93,53 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Text('Q',
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: 48,
-                            fontWeight: FontWeight.w900)),
+                            fontSize: 52,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -2)),
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Text('Quantrix',
-                    style: TextStyle(
-                        color: AppTheme.textPrimary,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1)),
-                const SizedBox(height: 8),
-                const Text('Análisis de mercado inteligente',
-                    style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
-                const SizedBox(height: 48),
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    color: AppTheme.primary,
-                    strokeWidth: 2,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 28),
+
+            // Texto animado
+            SlideTransition(
+              position: _textSlide,
+              child: FadeTransition(
+                opacity: _textFade,
+                child: Column(
+                  children: [
+                    const Text(
+                      'Quantrix',
+                      style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Análisis de mercado inteligente',
+                      style: TextStyle(
+                          color: AppTheme.textSecondary, fontSize: 14),
+                    ),
+                    const SizedBox(height: 48),
+                    ScaleTransition(
+                      scale: _pulse,
+                      child: const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primary,
+                          strokeWidth: 2.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

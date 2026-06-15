@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'firebase_options.dart';
+import 'models/portfolio_entry.dart';
+import 'models/alert_rule.dart';
+import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
 import 'services/connection_service.dart';
 import 'services/fcm_service.dart';
+import 'services/update_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/signals_screen.dart';
@@ -12,10 +18,13 @@ import 'screens/screener_screen.dart';
 import 'screens/news_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'widgets/update_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Orientación fija vertical
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -26,8 +35,30 @@ void main() async {
     statusBarIconBrightness: Brightness.light,
   ));
 
-  await Firebase.initializeApp();
-  ConnectionService().init();
+  // Inicializar Hive con adaptadores registrados
+  try {
+    await Hive.initFlutter();
+    if (!Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(PortfolioEntryAdapter());
+    }
+    if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(AlertRuleAdapter());
+    }
+    await Hive.openBox<PortfolioEntry>('portfolio');
+    await Hive.openBox<AlertRule>('alert_rules');
+  } catch (_) {}
+
+  // Inicializar Firebase de forma segura con timeout
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ).timeout(const Duration(seconds: 10));
+  } catch (_) {}
+
+  // Inicializar servicio de conexión
+  try {
+    ConnectionService().init();
+  } catch (_) {}
 
   runApp(const ProviderScope(child: QuantrixApp()));
 }
@@ -39,19 +70,33 @@ class QuantrixApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
 
-    // Iniciar FCM cuando el usuario esté listo
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FcmService().init();
-    });
-
     return MaterialApp(
       title: 'Quantrix',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeMode,
-      home: const SplashScreen(),
+      home: const AuthGate(),
     );
+  }
+}
+
+// Enruta automáticamente según estado de autenticación
+class AuthGate extends ConsumerWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    try {
+      final auth = ref.watch(authProvider);
+      return switch (auth.status) {
+        AuthStatus.loading => const SplashScreen(),
+        AuthStatus.authenticated => const MainShell(),
+        AuthStatus.unauthenticated => const LoginScreen(),
+      };
+    } catch (_) {
+      return const LoginScreen();
+    }
   }
 }
 
@@ -72,6 +117,24 @@ class _MainShellState extends State<MainShell> {
     NewsScreen(),
     SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // FCM — solo si Firebase está disponible
+      try {
+        await FcmService().init();
+      } catch (_) {}
+      // Verificar actualizaciones
+      try {
+        final update = await UpdateService().checkForUpdate();
+        if (mounted && update != null) {
+          await UpdateDialog.showIfNeeded(context, update);
+        }
+      } catch (_) {}
+    });
+  }
 
   void _onTabTap(int index) {
     if (_currentIndex == index) return;

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/signal_history_service.dart';
 import '../models/signal.dart';
@@ -59,7 +59,7 @@ class _SignalHistoryScreenState extends State<SignalHistoryScreen> {
                 children: [
                   Icon(Icons.history, color: AppTheme.textSecondary, size: 56),
                   SizedBox(height: 12),
-                  Text('Sin señales registradas aún',
+                  Text('Sin señales registradas aÃºn',
                       style: TextStyle(color: AppTheme.textSecondary, fontSize: 15)),
                   SizedBox(height: 6),
                   Text('Las señales se guardan al abrir la app',
@@ -89,7 +89,7 @@ class _SignalHistoryScreenState extends State<SignalHistoryScreen> {
                   const SizedBox(width: 8),
                   _StatCard('Bajistas', '$bearish', AppTheme.bearish),
                   const SizedBox(width: 8),
-                  _StatCard('≥80% conf.', '$highConf', AppTheme.warning),
+                  _StatCard('â‰¥80% conf.', '$highConf', AppTheme.warning),
                 ],
               ),
               const SizedBox(height: 8),
@@ -184,7 +184,7 @@ class _HistoryTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: color.withOpacity(0.15),
+            backgroundColor: color.withValues(alpha: 0.15),
             child: Text(entry.assetName.substring(0, 1).toUpperCase(),
                 style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
           ),
@@ -208,7 +208,7 @@ class _HistoryTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(entry.signalLabel,

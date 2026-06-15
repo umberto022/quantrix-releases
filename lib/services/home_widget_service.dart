@@ -20,11 +20,17 @@ class HomeWidgetService {
     final now = DateFormat('HH:mm').format(DateTime.now());
 
     String fgiLabel;
-    if (fearGreed < 20) fgiLabel = 'Miedo ext.';
-    else if (fearGreed < 40) fgiLabel = 'Miedo';
-    else if (fearGreed < 60) fgiLabel = 'Neutral';
-    else if (fearGreed < 80) fgiLabel = 'Codicia';
-    else fgiLabel = 'Codicia ext.';
+    if (fearGreed < 20) {
+      fgiLabel = 'Miedo ext.';
+    } else if (fearGreed < 40) {
+      fgiLabel = 'Miedo';
+    } else if (fearGreed < 60) {
+      fgiLabel = 'Neutral';
+    } else if (fearGreed < 80) {
+      fgiLabel = 'Codicia';
+    } else {
+      fgiLabel = 'Codicia ext.';
+    }
 
     await HomeWidget.saveWidgetData('btc_price', fmt.format(btcPrice));
     await HomeWidget.saveWidgetData('btc_change',
@@ -39,7 +45,7 @@ class HomeWidgetService {
     await HomeWidget.updateWidget(
       androidName: _widgetName,
       iOSName: _widgetName,
-      qualifiedAndroidName: '$_appGroupId.$_widgetName',
+      qualifiedAndroidName: 'es.antonborri.home_widget.HomeWidgetProvider',
     );
   }
 }

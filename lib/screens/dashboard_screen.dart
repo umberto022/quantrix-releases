@@ -1,7 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
+import '../providers/auth_provider.dart';
 import '../providers/market_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/asset_card.dart';
@@ -43,7 +44,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final cryptosAsync = ref.watch(topCryptosProvider);
     final fearGreedAsync = ref.watch(fearGreedProvider);
-    const userName = 'Analista';
+    final authState = ref.watch(authProvider);
+    final userName = authState.user?.name.split(' ').first ?? 'Analista';
 
     return Scaffold(
       body: RefreshIndicator(
@@ -123,7 +125,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
                           color: active
-                              ? AppTheme.primary.withOpacity(0.15)
+                              ? AppTheme.primary.withValues(alpha: 0.15)
                               : AppTheme.surfaceLight,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
@@ -255,12 +257,12 @@ class _SearchField extends StatelessWidget {
             autofocus: true,
             onChanged: onChanged,
             style: const TextStyle(color: AppTheme.textPrimary, fontSize: 15),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Buscar activo...',
-              hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+              hintStyle: TextStyle(color: AppTheme.textSecondary, fontSize: 15),
               border: InputBorder.none,
               prefixIcon:
-                  const Icon(Icons.search, color: AppTheme.textSecondary, size: 18),
+                  Icon(Icons.search, color: AppTheme.textSecondary, size: 18),
               contentPadding: EdgeInsets.zero,
               isDense: true,
             ),
@@ -344,7 +346,7 @@ class _FearGreedChip extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 4),
-        Text('Fear & Greed: ${value.toInt()} — $label',
+        Text('Fear & Greed: ${value.toInt()} · $label',
             style: TextStyle(color: color, fontSize: 10)),
       ],
     );

@@ -180,7 +180,7 @@ class _UserTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: AppTheme.primary.withOpacity(0.15),
+            backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
             child: Text(
               name.isNotEmpty ? name[0].toUpperCase() : '?',
               style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 14),
@@ -206,7 +206,7 @@ class _UserTile extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: plan == 'pro'
-                      ? AppTheme.warning.withOpacity(0.15)
+                      ? AppTheme.warning.withValues(alpha: 0.15)
                       : AppTheme.cardBorder,
                   borderRadius: BorderRadius.circular(10),
                 ),

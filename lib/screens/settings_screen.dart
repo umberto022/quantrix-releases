@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/currency_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_theme.dart';
 import 'admin_screen.dart';
+import 'exchanges_screen.dart';
+import 'portfolio_screen.dart';
 import 'price_alerts_screen.dart';
 import 'ai_chat_screen.dart';
 
@@ -44,7 +46,7 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: AppTheme.primary.withOpacity(0.2),
+                    backgroundColor: AppTheme.primary.withValues(alpha: 0.2),
                     child: Text(
                       user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
                       style: const TextStyle(color: AppTheme.primary, fontSize: 20, fontWeight: FontWeight.bold),
@@ -65,7 +67,7 @@ class SettingsScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.15),
+                      color: AppTheme.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -102,9 +104,9 @@ class SettingsScreen extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppTheme.bearish.withOpacity(0.08),
+                  color: AppTheme.bearish.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.bearish.withOpacity(0.3)),
+                  border: Border.all(color: AppTheme.bearish.withValues(alpha: 0.3)),
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -123,10 +125,24 @@ class SettingsScreen extends ConsumerWidget {
           const _SectionHeader('FUNCIONES'),
           const SizedBox(height: 8),
           _NavTile(
+            icon: Icons.account_balance_wallet_outlined,
+            label: 'Portafolio',
+            subtitle: 'Rastreá tus posiciones y P&L en tiempo real',
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PortfolioScreen())),
+          ),
+          const SizedBox(height: 8),
+          _NavTile(
             icon: Icons.notifications_active_outlined,
             label: 'Alertas de precio',
             subtitle: 'Notificaciones cuando el precio llegue a tu objetivo',
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PriceAlertsScreen())),
+          ),
+          const SizedBox(height: 8),
+          _NavTile(
+            icon: Icons.compare_arrows,
+            label: 'Comparar Exchanges',
+            subtitle: 'Precios en Binance, KuCoin, Bybit, OKX',
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ExchangesScreen())),
           ),
           const SizedBox(height: 8),
           _NavTile(
@@ -176,7 +192,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 Switch(
                   value: isDark,
-                  activeColor: AppTheme.primary,
+                  activeThumbColor: AppTheme.primary,
                   onChanged: (_) => ref.read(themeModeProvider.notifier).toggle(),
                 ),
               ],
@@ -185,7 +201,7 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Moneda
-          const _SectionHeader('MONEDA DE VISUALIZACIÓN'),
+          const _SectionHeader('MONEDA DE VISUALIZACIÃ“N'),
           const SizedBox(height: 8),
           converterAsync.when(
             data: (conv) => conv.currency.code == 'USD'
@@ -194,9 +210,9 @@ class SettingsScreen extends ConsumerWidget {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.1),
+                      color: AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppTheme.primary.withOpacity(0.3)),
+                      border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -224,11 +240,11 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           const _SectionHeader('SOBRE QUANTRIX'),
           const SizedBox(height: 8),
-          _InfoTile('Versión', '1.0.2'),
-          _InfoTile('Datos crypto', 'CoinGecko API'),
-          _InfoTile('Datos acciones', 'Alpha Vantage'),
-          _InfoTile('Tipo de cambio', 'Frankfurter + DolarAPI'),
-          _InfoTile('Indicadores', 'RSI · MACD · SMA · Fear&Greed'),
+          const _InfoTile('Versión', '1.2.2'),
+          const _InfoTile('Datos crypto', 'CoinGecko API'),
+          const _InfoTile('Datos acciones', 'Alpha Vantage'),
+          const _InfoTile('Tipo de cambio', 'Frankfurter + DolarAPI'),
+          const _InfoTile('Indicadores', 'RSI · MACD · SMA · Fear&Greed'),
         ],
       ),
     );
@@ -264,7 +280,7 @@ class _NavTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -302,7 +318,7 @@ class _CurrencyTile extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primary.withOpacity(0.1) : AppTheme.surface,
+            color: isSelected ? AppTheme.primary.withValues(alpha: 0.1) : AppTheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected ? AppTheme.primary : AppTheme.cardBorder,

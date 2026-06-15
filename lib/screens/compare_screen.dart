@@ -234,7 +234,7 @@ class _AssetHeader extends StatelessWidget {
 }
 
 class _SignalColumn extends StatelessWidget {
-  final signal;
+  final dynamic signal;
   const _SignalColumn({required this.signal});
 
   @override
@@ -271,8 +271,8 @@ class _MiniChart extends StatelessWidget {
 class _IndicatorTable extends StatelessWidget {
   final Asset assetA;
   final Asset assetB;
-  final signalA;
-  final signalB;
+  final dynamic signalA;
+  final dynamic signalB;
   const _IndicatorTable(
       {required this.assetA, required this.assetB, this.signalA, this.signalB});
 

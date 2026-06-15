@@ -1,5 +1,4 @@
-import 'dart:async';
-import 'dart:typed_data';
+﻿import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -147,9 +146,9 @@ class _FgiChip extends StatelessWidget {
       margin: const EdgeInsets.only(right: 4, top: 10, bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _color.withOpacity(0.15),
+        color: _color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _color.withOpacity(0.4)),
+        border: Border.all(color: _color.withValues(alpha: 0.4)),
       ),
       child: Text(
         '${value.toInt()} · $_label',
@@ -176,7 +175,7 @@ class _SignalCard extends StatelessWidget {
       final bytes = byteData.buffer.asUint8List();
 
       final signalLabel = signal.signalLabel;
-      final text = '${asset.symbol.toUpperCase()} — Señal $signalLabel\n'
+      final text = '${asset.symbol.toUpperCase()} · Señal $signalLabel\n'
           'RSI: ${signal.rsi.toStringAsFixed(0)} · Confianza: ${signal.confidence.toInt()}%\n'
           'Análisis generado por Quantrix';
 
@@ -187,7 +186,7 @@ class _SignalCard extends StatelessWidget {
     } catch (_) {
       // Fallback: compartir solo texto
       await Share.share(
-        '${asset.symbol.toUpperCase()} — ${signal.signalLabel}\n'
+        '${asset.symbol.toUpperCase()} "” ${signal.signalLabel}\n'
         'RSI: ${signal.rsi.toStringAsFixed(0)} · Confianza: ${signal.confidence.toInt()}%\n'
         'Análisis generado por Quantrix',
       );
@@ -214,7 +213,7 @@ class _SignalCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: signal.confidence >= 80
-                  ? signalColor.withOpacity(0.4)
+                  ? signalColor.withValues(alpha: 0.4)
                   : AppTheme.cardBorder,
             ),
           ),
@@ -267,7 +266,7 @@ class _SignalCard extends StatelessWidget {
                   _MiniIndicator('RSI', signal.rsi.toStringAsFixed(0), _rsiColor(signal.rsi)),
                   _MiniIndicator(
                     'MACD',
-                    signal.macdHistogram >= 0 ? '▲' : '▼',
+                    signal.macdHistogram >= 0 ? 'â–²' : 'â–¼',
                     signal.macdHistogram >= 0 ? AppTheme.bullish : AppTheme.bearish,
                   ),
                   _MiniIndicator('StochRSI', signal.stochRsi.toStringAsFixed(0),
@@ -316,7 +315,7 @@ class _MiniIndicator extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
@@ -337,9 +336,13 @@ class _ConfidenceBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color color;
-    if (confidence >= 85) color = AppTheme.bullish;
-    else if (confidence >= 70) color = AppTheme.warning;
-    else color = AppTheme.textSecondary;
+    if (confidence >= 85) {
+      color = AppTheme.bullish;
+    } else if (confidence >= 70) {
+      color = AppTheme.warning;
+    } else {
+      color = AppTheme.textSecondary;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,

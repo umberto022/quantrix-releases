@@ -12,52 +12,65 @@ class FcmService {
   final _localNotif = FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
-    await _fcm.requestPermission(alert: true, badge: true, sound: true);
+    try {
+      await _fcm.requestPermission(alert: true, badge: true, sound: true);
+    } catch (_) {}
 
-    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    await _localNotif.initialize(
-      const InitializationSettings(android: androidInit),
-    );
-
-    // Guardar token en Firestore
-    final token = await _fcm.getToken();
-    if (token != null) await _saveToken(token);
-
-    _fcm.onTokenRefresh.listen(_saveToken);
-
-    // Notificaciones en foreground
-    FirebaseMessaging.onMessage.listen((msg) {
-      final n = msg.notification;
-      if (n == null) return;
-      _localNotif.show(
-        msg.hashCode,
-        n.title,
-        n.body,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'quantrix_alerts',
-            'Alertas Quantrix',
-            importance: Importance.high,
-            priority: Priority.high,
-            icon: '@mipmap/ic_launcher',
-          ),
-        ),
+    try {
+      const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+      await _localNotif.initialize(
+        const InitializationSettings(android: androidInit),
       );
-    });
+    } catch (_) {}
+
+    try {
+      final token = await _fcm.getToken();
+      if (token != null) await _saveToken(token);
+      _fcm.onTokenRefresh.listen(_saveToken);
+    } catch (_) {}
+
+    try {
+      FirebaseMessaging.onMessage.listen((msg) {
+        final n = msg.notification;
+        if (n == null) return;
+        _localNotif.show(
+          msg.hashCode,
+          n.title,
+          n.body,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'quantrix_alerts',
+              'Alertas Quantrix',
+              importance: Importance.high,
+              priority: Priority.high,
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+        );
+      });
+    } catch (_) {}
   }
 
   Future<void> _saveToken(String token) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
-    await FirebaseFirestore.instance.collection('users').doc(uid).update({
-      'fcmToken': token,
-      'tokenUpdatedAt': FieldValue.serverTimestamp(),
-    });
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return;
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'fcmToken': token,
+        'tokenUpdatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (_) {}
   }
 
-  Future<void> subscribeTopic(String topic) =>
-      _fcm.subscribeToTopic(topic);
+  Future<void> subscribeTopic(String topic) async {
+    try {
+      await _fcm.subscribeToTopic(topic);
+    } catch (_) {}
+  }
 
-  Future<void> unsubscribeTopic(String topic) =>
-      _fcm.unsubscribeFromTopic(topic);
+  Future<void> unsubscribeTopic(String topic) async {
+    try {
+      await _fcm.unsubscribeFromTopic(topic);
+    } catch (_) {}
+  }
 }

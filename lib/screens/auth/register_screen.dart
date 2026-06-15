@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
@@ -100,7 +100,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   const SizedBox(height: 32),
 
                   // Nombre
-                  _Label('Nombre completo'),
+                  const _Label('Nombre completo'),
                   const SizedBox(height: 6),
                   _Field(
                     controller: _nameCtrl,
@@ -112,7 +112,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   const SizedBox(height: 16),
 
                   // Email
-                  _Label('Email'),
+                  const _Label('Email'),
                   const SizedBox(height: 6),
                   _Field(
                     controller: _emailCtrl,
@@ -125,7 +125,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   const SizedBox(height: 16),
 
                   // Contraseña
-                  _Label('Contraseña'),
+                  const _Label('Contraseña'),
                   const SizedBox(height: 6),
                   _Field(
                     controller: _passCtrl,
@@ -146,7 +146,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   const SizedBox(height: 16),
 
                   // Confirmar contraseña
-                  _Label('Confirmar contraseña'),
+                  const _Label('Confirmar contraseña'),
                   const SizedBox(height: 6),
                   _Field(
                     controller: _confirmCtrl,
@@ -209,9 +209,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        color: AppTheme.bearish.withOpacity(0.1),
+                        color: AppTheme.bearish.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppTheme.bearish.withOpacity(0.3)),
+                        border: Border.all(color: AppTheme.bearish.withValues(alpha: 0.3)),
                       ),
                       child: Text(_error!,
                           style: const TextStyle(color: AppTheme.bearish, fontSize: 13)),

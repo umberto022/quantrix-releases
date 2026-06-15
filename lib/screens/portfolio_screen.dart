@@ -161,7 +161,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                   dropdownColor: AppTheme.surfaceLight,
                   style: const TextStyle(color: AppTheme.textPrimary),
                   decoration: _inputDeco('Activo'),
-                  value: assetId,
+                  initialValue: assetId,
                   items: cryptos
                       .take(20)
                       .map((a) => DropdownMenuItem(
@@ -260,7 +260,7 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [AppTheme.surface, AppTheme.surfaceLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

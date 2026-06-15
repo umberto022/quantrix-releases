@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
@@ -158,7 +158,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primary.withOpacity(0.35),
+                            color: AppTheme.primary.withValues(alpha: 0.35),
                             blurRadius: 24,
                             offset: const Offset(0, 8),
                           ),
@@ -186,7 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   const SizedBox(height: 36),
 
                   // Email
-                  _Label('Email'),
+                  const _Label('Email'),
                   const SizedBox(height: 6),
                   _Field(
                     controller: _emailCtrl,
@@ -199,7 +199,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   const SizedBox(height: 16),
 
                   // Password
-                  _Label('Contraseña'),
+                  const _Label('Contraseña'),
                   const SizedBox(height: 6),
                   _Field(
                     controller: _passCtrl,
@@ -245,9 +245,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        color: AppTheme.bearish.withOpacity(0.1),
+                        color: AppTheme.bearish.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppTheme.bearish.withOpacity(0.3)),
+                        border: Border.all(color: AppTheme.bearish.withValues(alpha: 0.3)),
                       ),
                       child: Text(_error!,
                           style: const TextStyle(color: AppTheme.bearish, fontSize: 13)),
@@ -282,14 +282,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   const SizedBox(height: 20),
 
                   // Divider
-                  Row(children: [
-                    const Expanded(child: Divider(color: AppTheme.cardBorder)),
-                    const Padding(
+                  const Row(children: [
+                    Expanded(child: Divider(color: AppTheme.cardBorder)),
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
                       child: Text('ó',
                           style: TextStyle(color: AppTheme.textSecondary)),
                     ),
-                    const Expanded(child: Divider(color: AppTheme.cardBorder)),
+                    Expanded(child: Divider(color: AppTheme.cardBorder)),
                   ]),
                   const SizedBox(height: 20),
 

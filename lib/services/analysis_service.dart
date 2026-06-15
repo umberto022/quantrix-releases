@@ -20,8 +20,11 @@ class AnalysisService {
     double avgGain = 0, avgLoss = 0;
     for (int i = 1; i <= period; i++) {
       final diff = closes[i] - closes[i - 1];
-      if (diff > 0) avgGain += diff;
-      else avgLoss += diff.abs();
+      if (diff > 0) {
+        avgGain += diff;
+      } else {
+        avgLoss += diff.abs();
+      }
     }
     avgGain /= period;
     avgLoss /= period;
@@ -214,19 +217,33 @@ class AnalysisService {
     final price = prices.last;
 
     int score = 0;
-    if (rsi < 35) score += 2;
-    else if (rsi < 45) score++;
-    else if (rsi > 65) score -= 2;
-    else if (rsi > 55) score--;
+    if (rsi < 35) {
+      score += 2;
+    } else if (rsi < 45) {
+      score++;
+    } else if (rsi > 65) {
+      score -= 2;
+    } else if (rsi > 55) {
+      score--;
+    }
 
-    if (macd['macd']! > macd['signal']!) score++;
-    else score--;
+    if (macd['macd']! > macd['signal']!) {
+      score++;
+    } else {
+      score--;
+    }
 
-    if (price > sma20 && sma20 > sma50) score++;
-    else if (price < sma20 && sma20 < sma50) score--;
+    if (price > sma20 && sma20 > sma50) {
+      score++;
+    } else if (price < sma20 && sma20 < sma50) {
+      score--;
+    }
 
-    if (fgi < 35) score++;
-    else if (fgi > 65) score--;
+    if (fgi < 35) {
+      score++;
+    } else if (fgi > 65) {
+      score--;
+    }
 
     if (score >= 3) return SignalType.strongBullish;
     if (score >= 1) return SignalType.bullish;
@@ -419,14 +436,20 @@ class AnalysisService {
     // ── Determinar señal final ─────────────────────────────────────────────
     final totalVotes = bullishVotes + bearishVotes;
     final netVotes = bullishVotes - bearishVotes;
-    final maxPossible = 9; // 8 indicadores + volumen
+    const maxPossible = 9; // 8 indicadores + volumen
 
     SignalType signal;
-    if (netVotes >= 4) signal = SignalType.strongBullish;
-    else if (netVotes >= 2) signal = SignalType.bullish;
-    else if (netVotes <= -4) signal = SignalType.strongBearish;
-    else if (netVotes <= -2) signal = SignalType.bearish;
-    else signal = SignalType.neutral;
+    if (netVotes >= 4) {
+      signal = SignalType.strongBullish;
+    } else if (netVotes >= 2) {
+      signal = SignalType.bullish;
+    } else if (netVotes <= -4) {
+      signal = SignalType.strongBearish;
+    } else if (netVotes <= -2) {
+      signal = SignalType.bearish;
+    } else {
+      signal = SignalType.neutral;
+    }
 
     // ── Confianza multi-timeframe bonus ───────────────────────────────────
     final isBull = netVotes > 0;

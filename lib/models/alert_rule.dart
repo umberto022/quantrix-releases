@@ -46,15 +46,15 @@ class AlertRule extends HiveObject {
   String get description {
     switch (condition) {
       case AlertCondition.priceBelow:
-        return '${assetSymbol} precio baja de \$${targetValue.toStringAsFixed(2)}';
+        return '$assetSymbol precio baja de \$${targetValue.toStringAsFixed(2)}';
       case AlertCondition.priceAbove:
-        return '${assetSymbol} precio sube de \$${targetValue.toStringAsFixed(2)}';
+        return '$assetSymbol precio sube de \$${targetValue.toStringAsFixed(2)}';
       case AlertCondition.rsiBelow:
-        return '${assetSymbol} RSI baja de ${targetValue.toStringAsFixed(0)}';
+        return '$assetSymbol RSI baja de ${targetValue.toStringAsFixed(0)}';
       case AlertCondition.rsiAbove:
-        return '${assetSymbol} RSI sube de ${targetValue.toStringAsFixed(0)}';
+        return '$assetSymbol RSI sube de ${targetValue.toStringAsFixed(0)}';
       case AlertCondition.signalChange:
-        return '${assetSymbol} señal cambia a COMPRA';
+        return '$assetSymbol señal cambia a COMPRA';
     }
   }
 }

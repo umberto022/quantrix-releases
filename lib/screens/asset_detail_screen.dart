@@ -191,7 +191,7 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                _SectionTitle('Datos de Mercado'),
+                const _SectionTitle('Datos de Mercado'),
                 const SizedBox(height: 12),
                 _FundamentalRow('Market Cap', fmtCompact.format(asset.marketCap)),
                 _FundamentalRow('Volumen 24h', fmtCompact.format(asset.volume24h)),
@@ -199,7 +199,7 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen>
                     '${asset.change24h >= 0 ? '+' : ''}\$${asset.change24h.toStringAsFixed(2)}'),
                 if (srLevels.isNotEmpty) ...[
                   const SizedBox(height: 24),
-                  _SectionTitle('Niveles S/R en gráfica'),
+                  const _SectionTitle('Niveles S/R en gráfica'),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -223,7 +223,7 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen>
                   const SizedBox(height: 20),
 
                   // Momentum oscillators
-                  _SectionTitle('Osciladores de Momentum'),
+                  const _SectionTitle('Osciladores de Momentum'),
                   const SizedBox(height: 12),
                   _RsiBar(rsi: signal.rsi, label: 'RSI (14)'),
                   const SizedBox(height: 10),
@@ -234,31 +234,31 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen>
                   const SizedBox(height: 20),
 
                   // MACD
-                  _SectionTitle('MACD'),
+                  const _SectionTitle('MACD'),
                   const SizedBox(height: 12),
                   _MacdCard(signal: signal),
                   const SizedBox(height: 20),
 
                   // Bollinger Bands
-                  _SectionTitle('Bandas de Bollinger (20, 2σ)'),
+                  const _SectionTitle('Bandas de Bollinger (20, 2σ)'),
                   const SizedBox(height: 12),
                   _BollingerCard(signal: signal, currentPrice: asset.price),
                   const SizedBox(height: 20),
 
                   // Medias móviles
-                  _SectionTitle('Medias Móviles'),
+                  const _SectionTitle('Medias Móviles'),
                   const SizedBox(height: 12),
                   _MaTable(signal: signal, currentPrice: asset.price, fmtCompact: fmtCompact),
                   const SizedBox(height: 20),
 
                   // Volatilidad y fuerza
-                  _SectionTitle('Volatilidad y Fuerza de Tendencia'),
+                  const _SectionTitle('Volatilidad y Fuerza de Tendencia'),
                   const SizedBox(height: 12),
                   Row(children: [
                     _InfoCard('ATR (14)', '\$${signal.atr.toStringAsFixed(2)}',
                         'Rango medio diario', AppTheme.textPrimary),
                     const SizedBox(width: 8),
-                    _InfoCard('ADX aprox.', '${signal.adxApprox.toStringAsFixed(0)}',
+                    _InfoCard('ADX aprox.', signal.adxApprox.toStringAsFixed(0),
                         signal.adxApprox > 40 ? 'Tendencia fuerte' : 'Tendencia débil',
                         signal.adxApprox > 40 ? AppTheme.primary : AppTheme.warning),
                     const SizedBox(width: 8),
@@ -269,14 +269,14 @@ class _AssetDetailScreenState extends ConsumerState<AssetDetailScreen>
                   const SizedBox(height: 20),
 
                   // Volumen
-                  _SectionTitle('Análisis de Volumen'),
+                  const _SectionTitle('Análisis de Volumen'),
                   const SizedBox(height: 12),
                   _VolumeCard(signal: signal),
                   const SizedBox(height: 20),
 
                   // Multi-timeframe
                   if (signal.tfDay != null || signal.tfWeek != null || signal.tfMonth != null) ...[
-                    _SectionTitle('Análisis Multi-Timeframe'),
+                    const _SectionTitle('Análisis Multi-Timeframe'),
                     const SizedBox(height: 12),
                     _MultiTimeframeCard(signal: signal),
                     const SizedBox(height: 20),
@@ -358,7 +358,7 @@ class _SRSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _SectionTitle('Soporte y Resistencia'),
+            const _SectionTitle('Soporte y Resistencia'),
             const SizedBox(height: 12),
             _SRCard(levels: levels, currentPrice: currentPrice, fmt: fmt),
           ],
@@ -387,7 +387,7 @@ class _CorrelationsSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _SectionTitle('Correlaciones (90 días)'),
+            const _SectionTitle('Correlaciones (90 días)'),
             const SizedBox(height: 12),
             _CorrelationsCard(correlations: corrs),
           ],
@@ -412,7 +412,7 @@ class _SignalHistorySection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _SectionTitle('Historial de Señales'),
+            const _SectionTitle('Historial de Señales'),
             const SizedBox(height: 12),
             _SignalHistoryCard(history: history),
           ],
@@ -602,20 +602,20 @@ class _SRCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Row(children: [
-              const Expanded(
+              Expanded(
                   child: Text('Nivel',
                       style: TextStyle(
                           color: AppTheme.textSecondary, fontSize: 12))),
-              const SizedBox(
+              SizedBox(
                   width: 80,
                   child: Text('Precio',
                       style: TextStyle(
                           color: AppTheme.textSecondary, fontSize: 12),
                       textAlign: TextAlign.right)),
-              const SizedBox(
+              SizedBox(
                   width: 70,
                   child: Text('Dist.',
                       style: TextStyle(

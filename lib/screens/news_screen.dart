@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import '../services/news_service.dart';
@@ -169,7 +169,7 @@ class _NewsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: item.sentiment != 'neutral'
-                ? color.withOpacity(0.3)
+                ? color.withValues(alpha: 0.3)
                 : AppTheme.cardBorder,
           ),
         ),
@@ -181,7 +181,7 @@ class _NewsCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(

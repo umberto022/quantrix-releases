@@ -121,8 +121,6 @@ class AnalysisSignal {
 
   String get bbPosition {
     if (bbUpper == bbLower) return 'Normal';
-    final range = bbUpper - bbLower;
-    // Necesitamos el precio actual — esto se usa en UI con el asset
     return 'Normal';
   }
 

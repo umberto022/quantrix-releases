@@ -21,26 +21,47 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  final _auth = FirebaseAuth.instance;
-  final _db = FirebaseFirestore.instance;
+  FirebaseAuth? _auth;
+  FirebaseFirestore? _db;
 
   AuthNotifier() : super(const AuthState(status: AuthStatus.loading)) {
-    _auth.authStateChanges().listen((user) async {
-      if (user == null) {
+    _init();
+  }
+
+  void _init() {
+    try {
+      _auth = FirebaseAuth.instance;
+      _db = FirebaseFirestore.instance;
+    } catch (_) {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+      return;
+    }
+    try {
+      _auth!.authStateChanges().listen((user) async {
+        try {
+          if (user == null) {
+            state = const AuthState(status: AuthStatus.unauthenticated);
+          } else {
+            final profile = await _fetchProfile(user.uid);
+            state = AuthState(status: AuthStatus.authenticated, user: profile);
+          }
+        } catch (_) {
+          state = const AuthState(status: AuthStatus.unauthenticated);
+        }
+      }, onError: (_) {
         state = const AuthState(status: AuthStatus.unauthenticated);
-      } else {
-        final profile = await _fetchProfile(user.uid);
-        state = AuthState(status: AuthStatus.authenticated, user: profile);
-      }
-    });
+      });
+    } catch (_) {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+    }
   }
 
   Future<QuantrixUser> _fetchProfile(String uid) async {
-    final doc = await _db.collection('users').doc(uid).get();
+    final doc = await _db!.collection('users').doc(uid).get();
     if (doc.exists) {
       return QuantrixUser.fromJson({...doc.data()!, 'id': uid});
     }
-    final user = _auth.currentUser!;
+    final user = _auth!.currentUser!;
     return QuantrixUser(
       id: uid,
       name: user.displayName ?? user.email!.split('@')[0],
@@ -54,9 +75,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String email,
     required String password,
   }) async {
+    if (_auth == null || _db == null) {
+      return 'Firebase no disponible. Verificá tu conexión e intentá de nuevo.';
+    }
     state = const AuthState(status: AuthStatus.loading);
     try {
-      final cred = await _auth.createUserWithEmailAndPassword(
+      final cred = await _auth!.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
@@ -69,20 +93,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
         createdAt: DateTime.now(),
       );
 
-      await _db.collection('users').doc(cred.user!.uid).set(user.toJson());
+      await _db!.collection('users').doc(cred.user!.uid).set(user.toJson());
       state = AuthState(status: AuthStatus.authenticated, user: user);
       return null;
     } on FirebaseAuthException catch (e) {
       final msg = _mapError(e.code);
       state = AuthState(status: AuthStatus.unauthenticated, error: msg);
       return msg;
+    } catch (_) {
+      state = const AuthState(status: AuthStatus.unauthenticated, error: 'Error inesperado');
+      return 'Error inesperado. Intentá de nuevo';
     }
   }
 
   Future<String?> login({required String email, required String password}) async {
+    if (_auth == null) {
+      return 'Firebase no disponible. Verificá tu conexión e intentá de nuevo.';
+    }
     state = const AuthState(status: AuthStatus.loading);
     try {
-      await _auth.signInWithEmailAndPassword(
+      await _auth!.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
@@ -91,19 +121,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final msg = _mapError(e.code);
       state = AuthState(status: AuthStatus.unauthenticated, error: msg);
       return msg;
+    } catch (_) {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+      return 'Error inesperado. Intentá de nuevo';
     }
   }
 
   Future<void> logout() async {
-    await _auth.signOut();
+    try {
+      await _auth?.signOut();
+    } catch (_) {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+    }
   }
 
   Future<String?> sendPasswordReset(String email) async {
+    if (_auth == null) return 'Firebase no disponible';
     try {
-      await _auth.sendPasswordResetEmail(email: email.trim());
+      await _auth!.sendPasswordResetEmail(email: email.trim());
       return null;
     } on FirebaseAuthException catch (e) {
       return _mapError(e.code);
+    } catch (_) {
+      return 'Error inesperado. Intentá de nuevo';
     }
   }
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/price_alert_provider.dart';
@@ -89,10 +89,10 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
                   dropdownColor: AppTheme.surfaceLight,
                   style: const TextStyle(color: AppTheme.textPrimary),
                   decoration: _deco('Activo'),
-                  value: assetId,
+                  initialValue: assetId,
                   items: cryptos.take(30).map((a) => DropdownMenuItem(
                     value: a.id,
-                    child: Text('${a.symbol} — ${a.name}',
+                    child: Text('${a.symbol} "” ${a.name}',
                         style: const TextStyle(color: AppTheme.textPrimary)),
                   )).toList(),
                   onChanged: (v) {
@@ -116,7 +116,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: condition == AlertCondition.above
-                            ? AppTheme.bullish.withOpacity(0.15)
+                            ? AppTheme.bullish.withValues(alpha: 0.15)
                             : AppTheme.surfaceLight,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
@@ -138,7 +138,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: condition == AlertCondition.below
-                            ? AppTheme.bearish.withOpacity(0.15)
+                            ? AppTheme.bearish.withValues(alpha: 0.15)
                             : AppTheme.surfaceLight,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
@@ -227,7 +227,7 @@ class _AlertTile extends StatelessWidget {
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: alert.triggered ? AppTheme.cardBorder : color.withOpacity(0.3),
+          color: alert.triggered ? AppTheme.cardBorder : color.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -235,7 +235,7 @@ class _AlertTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(

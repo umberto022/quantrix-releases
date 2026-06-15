@@ -67,8 +67,10 @@ class PriceAlertNotifier extends StateNotifier<List<PriceAlert>> {
   }
 
   Future<void> _initNotif() async {
-    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    await _notif.initialize(const InitializationSettings(android: androidInit));
+    try {
+      const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+      await _notif.initialize(const InitializationSettings(android: androidInit));
+    } catch (_) {}
   }
 
   Future<void> _load() async {

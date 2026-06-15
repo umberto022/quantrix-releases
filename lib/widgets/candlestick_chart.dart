@@ -64,7 +64,7 @@ class _CandlePainter extends CustomPainter {
 
     // Grid lines
     final gridPaint = Paint()
-      ..color = AppTheme.cardBorder.withOpacity(0.5)
+      ..color = AppTheme.cardBorder.withValues(alpha: 0.5)
       ..strokeWidth = 0.5;
 
     for (int i = 1; i <= 4; i++) {
